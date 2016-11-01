@@ -1,5 +1,6 @@
 package com.example.hrker.cpu_temp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,8 +9,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TextView;
 import android.os.Build;
+
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,9 +25,10 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity {
 
 
-    private TextView tvDOS, tvDAPI, tvDNumCore, tvChipSet, tvCPUF;
+    private TextView tvDOS, tvDAPI, tvDNumCore, tvChipSet, tvCPUF, tvTemp;
     public String deviceOS = Build.VERSION.RELEASE;
     public int deviceAPI = Build.VERSION.SDK_INT;
+    private Button btnScan;
 
     private CalcTemp CT;
 
@@ -52,9 +57,19 @@ public class MainActivity extends AppCompatActivity {
         tvDAPI = (TextView) findViewById(R.id.tvDAPI);
         tvDNumCore = (TextView) findViewById(R.id.tvDNumCores);
         tvCPUF = (TextView) findViewById(R.id.tvCPUF);
-
         tvChipSet = (TextView) findViewById(R.id.tvChipSet);
 
+        tvTemp = (TextView) findViewById(R.id.tvTemp);
+        btnScan = (Button) findViewById(R.id.btnScan);
+        btnScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Scanning Files...", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                ScanPath scan = new ScanPath();
+                tvTemp.setText(scan.startScan() + "F");
+            }
+        });
     }
 
 

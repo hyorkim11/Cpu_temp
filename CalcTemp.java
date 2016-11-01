@@ -38,15 +38,16 @@ public class CalcTemp extends Activity implements SensorEventListener {
     }
 
     public void printCPUFreq(TextView text) {
-        // takes in text and changes text into cpu frequencies
-        text.setText(Arrays.toString(getCurFrequency(getNumCores())));
+        // takes in text and changes text into cpu frequencies in KiloHertz
+        // 1 KHz = 0.001 MHz
+        text.setText("CPU Frequency (MHz): " + Arrays.toString(KtoM(getCurFrequency(getNumCores()))));
     }
 
     public void printCPUStats(TextView text) {
         // takes in text and changes text into array printout of cpu usage
         // usage in percentages
         int[] x = getCpuUsageStatistic();
-        text.setText(Arrays.toString(x));
+        text.setText("CPU Stats: " + Arrays.toString(x));
     }
 
     protected void onResume() {
@@ -99,7 +100,7 @@ public class CalcTemp extends Activity implements SensorEventListener {
         // reads current scaling_cur_freq of each cores
         // returns String[] of all the frequencies
         // default cpu path "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
-        String[] frequencyList= new String[coreNum];
+        String[] frequencyList = new String[coreNum];
         String x;
 
         for (int i = 0; i < coreNum; i++) {
@@ -119,15 +120,31 @@ public class CalcTemp extends Activity implements SensorEventListener {
         return frequencyList;
     }
 
+    // input : an array of Strings
+    // output : an array of Ints
+    // converts KHz to MHz
+    private double[] KtoM(String[] x) {
+        double[] y = new double[x.length];
+        double temp;
+        int temp2;
+
+        for (int i = 0; i < x.length; i++) {
+            try {
+                temp = Integer.parseInt(x[i]);
+                temp2 = (int) (temp * (0.001));
+                y[i] = temp2;
+            } catch (Exception e) {
+                Log.e("executeTop", "error in getting first line of top");
+                e.printStackTrace();
+            }
+
+        }
+        return y;
+    }
+
+
     private void messageBox(String method, String message) {
         Log.d("EXCEPTION: " + method,  message);
-
-        AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
-        messageBox.setTitle(method);
-        messageBox.setMessage(message);
-        messageBox.setCancelable(false);
-        messageBox.setNeutralButton("OK", null);
-        messageBox.show();
     }
 
     private int[] getCpuUsageStatistic() {

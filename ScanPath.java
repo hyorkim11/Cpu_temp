@@ -55,6 +55,9 @@ public class ScanPath extends Activity {
                 Log.d("EXCEPTION: ", "file not at p"+i);
             }
         }
+        // this converts into Fahrenheit
+        temp = (int)(temp*1.8)+32;
         return temp;
+
     }
 }

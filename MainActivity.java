@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvDOS, tvDAPI, tvDNumCore, tvChipSet, tvCPUF, tvTemp;
     public String deviceOS = Build.VERSION.RELEASE;
     public int deviceAPI = Build.VERSION.SDK_INT;
-    private Button btnScan;
 
     private CalcTemp CT;
 
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         tvChipSet = (TextView) findViewById(R.id.tvChipSet);
 
         tvTemp = (TextView) findViewById(R.id.tvTemp);
-        btnScan = (Button) findViewById(R.id.btnScan);
+        FloatingActionButton btnScan = (FloatingActionButton) findViewById(R.id.btnScan);
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
                 tvTemp.setText(scan.startScan() + "F");
             }
         });
+
+        tvDOS.setText("OS: " + deviceOS);
+        tvDAPI.setText("API: " + deviceAPI);
+        tvDNumCore.setText("Num Cores: " + getNumCores());
     }
 
 
@@ -95,12 +98,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateTV() {
-        tvDOS.setText("OS: " + deviceOS);
-        tvDAPI.setText("API: " + deviceAPI);
-        tvDNumCore.setText("Num Cores: " + getNumCores());
+
         tvChipSet.setText(getInfo());
         CT.printCPUFreq(tvCPUF);
-
     }
 
     private String getInfo() {

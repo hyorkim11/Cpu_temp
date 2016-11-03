@@ -54,7 +54,7 @@ public class TempService extends Service {
 
     private void DisplayLoggingInfo() {
         Log.d(TAG, "entered DisplayLoggingInfo");
-        intent.putExtra("temperature", scan.startScan() + "F");
+        intent.putExtra("temperature", scan.startScan());
         sendBroadcast(intent);
     }
 }

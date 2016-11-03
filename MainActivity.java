@@ -13,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -24,16 +26,15 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
-// "\u00B0" degree symbol
 
-    private TextView tvDOS, tvDAPI, tvDNumCore, tvChipSet, tvCPUF, tvTemp, tvTemperature;
+    private TextView tvDOS, tvDAPI, tvDNumCore, tvChipSet, tvCPUF, tvTemperature, tvTempType;
     public String deviceOS = Build.VERSION.RELEASE;
     public int deviceAPI = Build.VERSION.SDK_INT;
-
-
     private CalcTemp CT;
     private Intent tempIntent;
 
+    private Switch mSwitch;
+    private boolean mTempType = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         init();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
 
         //floating button right side
         fab.setOnClickListener(new View.OnClickListener() {
@@ -65,31 +65,30 @@ public class MainActivity extends AppCompatActivity {
         tvCPUF = (TextView) findViewById(R.id.tvCPUF);
         tvChipSet = (TextView) findViewById(R.id.tvChipSet);
 
-        tvTemp = (TextView) findViewById(R.id.tvTemp);
         tvTemperature = (TextView) findViewById(R.id.tvTemperature);
-        FloatingActionButton btnScan = (FloatingActionButton) findViewById(R.id.btnScan);
+        tvTempType = (TextView) findViewById(R.id.tempType);
 
-        // floating button left side
-        btnScan.setOnClickListener(new View.OnClickListener() {
+        mSwitch = (Switch) findViewById(R.id.sTempType);
+        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Scanning Files...", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                ScanPath scan = new ScanPath();
-                tvTemp.setText(scan.startScan() + "F");
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                mTempType = b;
+
+                if (b) {
+                    // fahrenheit
+                    tvTempType.setText("\u00B0F");
+                } else {
+                    // celsius
+                    tvTempType.setText("\u00B0C");
+                }
             }
         });
-
         tvDOS.setText("OS: " + deviceOS);
         tvDAPI.setText("API: " + deviceAPI);
         tvDNumCore.setText("Num Cores: " + getNumCores());
 
         // start the temperature service
         tempIntent = new Intent(this, TempService.class);
-    }
-
-    private void startService() {
-
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -114,8 +113,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateTemp(Intent intent) {
-        int tempp= intent.getIntExtra("temperature", 0);
-        tvTemperature.setText(tempp);
+        int value = intent.getIntExtra("temperature", 0);
+        if (mTempType) {
+            // fahrenheit
+            value = (int) (value * 1.8) + 32;
+        }
+        tvTemperature.setText(value + " ");
     }
 
 
@@ -141,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateTV() {
-
         tvChipSet.setText(getInfo());
         CT.printCPUFreq(tvCPUF);
     }

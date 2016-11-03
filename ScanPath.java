@@ -72,7 +72,7 @@ public class ScanPath extends Activity {
             }
         }
         // this converts into Fahrenheit
-        temp = (int) (temp * 1.8) + 32;
+//        temp = (int) (temp * 1.8) + 32;
 
         // just return the celsius value
         return temp;

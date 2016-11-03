@@ -1,19 +1,19 @@
 package com.example.hrker.cpu_temp;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.view.View;
 import android.widget.TextView;
-import android.os.Build;
-
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,12 +24,16 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
+// "\u00B0" degree symbol
 
-    private TextView tvDOS, tvDAPI, tvDNumCore, tvChipSet, tvCPUF, tvTemp;
+    private TextView tvDOS, tvDAPI, tvDNumCore, tvChipSet, tvCPUF, tvTemp, tvTemperature;
     public String deviceOS = Build.VERSION.RELEASE;
     public int deviceAPI = Build.VERSION.SDK_INT;
 
+
     private CalcTemp CT;
+    private Intent tempIntent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         init();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
+        //floating button right side
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,7 +66,10 @@ public class MainActivity extends AppCompatActivity {
         tvChipSet = (TextView) findViewById(R.id.tvChipSet);
 
         tvTemp = (TextView) findViewById(R.id.tvTemp);
+        tvTemperature = (TextView) findViewById(R.id.tvTemperature);
         FloatingActionButton btnScan = (FloatingActionButton) findViewById(R.id.btnScan);
+
+        // floating button left side
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,6 +83,39 @@ public class MainActivity extends AppCompatActivity {
         tvDOS.setText("OS: " + deviceOS);
         tvDAPI.setText("API: " + deviceAPI);
         tvDNumCore.setText("Num Cores: " + getNumCores());
+
+        // start the temperature service
+        tempIntent = new Intent(this, TempService.class);
+    }
+
+    private void startService() {
+
+    }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateTemp(intent);
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startService(tempIntent);
+        registerReceiver(broadcastReceiver, new IntentFilter(TempService.BROADCAST_ACTION));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
+        stopService(tempIntent);
+    }
+
+    private void updateTemp(Intent intent) {
+        int tempp= intent.getIntExtra("temperature", 0);
+        tvTemperature.setText(tempp);
     }
 
 

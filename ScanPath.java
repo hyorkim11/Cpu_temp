@@ -32,7 +32,6 @@ public class ScanPath extends Activity {
             "/sys/class/i2c-adapter/i2c-4/4-004c/temperature",
     };
 
-
     public int startScan() {
         // takes the urls and scans them
         // returns 0 if none found
@@ -56,24 +55,24 @@ public class ScanPath extends Activity {
                         temp2 = (temp2 / 1000);
                     }
 
-                    temp = (temp + temp2)/2;
+                    temp = (temp + temp2) / 2;
                     Log.d("EXCEPTION: ", "value " + temp2 + " found at p" + i);
                     temp2 = 0;
                 } else {
                     // if temp value hasn't been found yet, but found one!
                     temp = Integer.parseInt(x);
                     if (temp > 100) {
-                        temp = (temp/1000);
+                        temp = (temp / 1000);
                     }
                     foundAlready = true;
                 }
                 reader.close();
             } catch (IOException e) {
-                Log.d("EXCEPTION: ", "file not at p"+i);
+                Log.d("EXCEPTION: ", "file not at p" + i);
             }
         }
         // this converts into Fahrenheit
-        temp = (int)(temp*1.8)+32;
+        temp = (int) (temp * 1.8) + 32;
 
         // just return the celsius value
         return temp;

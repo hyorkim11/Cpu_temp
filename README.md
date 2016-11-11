@@ -1,5 +1,5 @@
-# Cpu_temp
+# Cpu_Temp
 
 This is a contracted Android project for the purpose of a university research.
 
-This application aims to scan the device and return a few basic information about the device's cpu information.
+This application scans the device and return a few basic information about the device's temperature information.

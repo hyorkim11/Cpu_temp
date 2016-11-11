@@ -8,8 +8,10 @@ import java.io.RandomAccessFile;
 
 
 public class ScanPath extends Activity {
+    // This class iterates through an array of Strings of possible filepaths of devices
+    // to retrieve the CPU temperature values
 
-
+    // Initialize File Path String Array
     private String[] temp_urls = new String[]{
             "/sys/devices/system/cpu/cpu0/cpufreq/cpu_temp",
             "/sys/devices/system/cpu/cpu0/cpufreq/FakeShmoo_cpu_temp",
@@ -33,12 +35,12 @@ public class ScanPath extends Activity {
     };
 
     public int startScan() {
-        // takes the urls and scans them
+        // Iterate through String Array
         // returns 0 if none found
-        // default value retrieved in celsius
-        String x;
-        int temp = 0, temp2 = 0;
+        // default temperature value retrieved in Celsius
         boolean foundAlready = false;
+        int temp = 0, temp2 = 0;
+        String x;
 
         for (int i = 0; i < temp_urls.length; i++) {
 
@@ -71,6 +73,7 @@ public class ScanPath extends Activity {
                 Log.d("EXCEPTION: ", "file not at p" + i);
             }
         }
+
         // this converts into Fahrenheit
 //        temp = (int) (temp * 1.8) + 32;
 

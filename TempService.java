@@ -9,14 +9,15 @@ import android.util.Log;
 import java.util.Date;
 
 public class TempService extends Service {
+    // This class is the Service class that utilizes the ScanPath.java class
+    // to retrieve the temperature values
 
-    private static final String TAG = "BroadcastService";
+    // Initialize variables
     public static final String BROADCAST_ACTION = "com.example.hrker.cpu_temp";
-
+    private static final String TAG = "BroadcastService";
     private final Handler handler = new Handler();
     Intent intent;
     ScanPath scan;
-
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -45,10 +46,12 @@ public class TempService extends Service {
 
     }
 
+    // This Runnable sends data to MainActivity every 1 second
+    // Fix time value as you see fit
     private Runnable sendUpdatesToUI = new Runnable() {
         public void run() {
             DisplayLoggingInfo();
-            handler.postDelayed(this, 1000); // 5 seconds
+            handler.postDelayed(this, 1000); // 1000 = 1 second
         }
     };
 

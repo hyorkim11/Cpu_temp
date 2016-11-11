@@ -27,14 +27,16 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity {
 
 
-    private TextView tvDOS, tvDAPI, tvDNumCore, tvChipSet, tvCPUF, tvTemperature, tvTempType;
+    // Variable Declarations
+    private TextView tvDOS, tvDAPI, tvDNumCore, tvChipSet,
+            tvCPUF, tvTemperature, tvTempType, tvBatTemp;
     public String deviceOS = Build.VERSION.RELEASE;
     public int deviceAPI = Build.VERSION.SDK_INT;
-    private CalcTemp CT;
-    private Intent tempIntent;
-
-    private Switch mSwitch;
     private boolean mTempType = false;
+    private Intent tempIntent;
+    private Switch mSwitch;
+    private CpuInfo CT;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,19 +57,22 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
+    } // end onCreate()
 
+    // Initial Activity Set-Up
     private void init() {
-        CT = new CalcTemp();
-        tvDOS = (TextView) findViewById(R.id.tvDOS);
-        tvDAPI = (TextView) findViewById(R.id.tvDAPI);
-        tvDNumCore = (TextView) findViewById(R.id.tvDNumCores);
-        tvCPUF = (TextView) findViewById(R.id.tvCPUF);
-        tvChipSet = (TextView) findViewById(R.id.tvChipSet);
 
         tvTemperature = (TextView) findViewById(R.id.tvTemperature);
+        tvDNumCore = (TextView) findViewById(R.id.tvDNumCores);
         tvTempType = (TextView) findViewById(R.id.tempType);
+        tvChipSet = (TextView) findViewById(R.id.tvChipSet);
+        tvBatTemp = (TextView) findViewById(R.id.tvBatTemp);
+        tvDAPI = (TextView) findViewById(R.id.tvDAPI);
+        tvCPUF = (TextView) findViewById(R.id.tvCPUF);
+        tvDOS = (TextView) findViewById(R.id.tvDOS);
+        CT = new CpuInfo();
 
+        // Initialize Temperature Type Switch
         mSwitch = (Switch) findViewById(R.id.sTempType);
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -83,14 +88,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Initial Placeholder Text
         tvDOS.setText("OS: " + deviceOS);
         tvDAPI.setText("API: " + deviceAPI);
         tvDNumCore.setText("Num Cores: " + getNumCores());
 
-        // start the temperature service
+        // Begin Temperature Service "TempService.java"
         tempIntent = new Intent(this, TempService.class);
-    }
+    } // end init()
 
+
+    // Broadcast Receiver Initialization
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -98,8 +107,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
     @Override
     public void onResume() {
+        // Re-register receiver when Activity resumes to save battery life
         super.onResume();
         startService(tempIntent);
         registerReceiver(broadcastReceiver, new IntentFilter(TempService.BROADCAST_ACTION));
@@ -107,11 +118,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onPause() {
+        // Unregister when this Activity Pauses to save battery life
         super.onPause();
         unregisterReceiver(broadcastReceiver);
         stopService(tempIntent);
     }
 
+    // Updates UI temperature text values
     private void updateTemp(Intent intent) {
         int value = intent.getIntExtra("temperature", 0);
         if (mTempType) {
@@ -131,23 +144,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    // Updates UI by fetching necessary values from CpuInfo.java class
     private void updateTV() {
         tvChipSet.setText(getInfo());
         CT.printCPUFreq(tvCPUF);
     }
 
+    // Fetch Basic CPU Information
     private String getInfo() {
         StringBuffer sb = new StringBuffer();
 
@@ -167,30 +178,30 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return sb.toString();
-    }
+    } // end getInfo()
 
 
+    // Check Current Device SDK Level and fetch number of CPU Cores
+    // by calling appropriate functions
     private int getNumCores() {
-        if(Build.VERSION.SDK_INT >= 17) {
+        if (Build.VERSION.SDK_INT >= 17) {
             return Runtime.getRuntime().availableProcessors();
-        }
-        else {
+        } else {
             return getNumCoresOld();
         }
-    }
+    } // end getNumCores()
 
-    /**
-     * Gets the number of cores available in this device, across all processors.
-     * Requires: Ability to peruse the filesystem at "/sys/devices/system/cpu"
-     * @return The number of cores, or 1 if failed to get result
-     */
+
+    // Helper Function for getNumCores() function
+    // Fetch Number of CPU Cores as documented by manufacturer
+    // Returns 1 if failed to get result
     private int getNumCoresOld() {
         //Private Class to display only CPU devices in the directory listing
         class CpuFilter implements FileFilter {
             @Override
             public boolean accept(File pathname) {
                 //Check if filename is "cpu", followed by a single digit number
-                if(Pattern.matches("cpu[0-9]+", pathname.getName())) {
+                if (Pattern.matches("cpu[0-9]+", pathname.getName())) {
                     return true;
                 }
                 return false;
@@ -204,9 +215,9 @@ public class MainActivity extends AppCompatActivity {
             File[] files = dir.listFiles(new CpuFilter());
             //Return the number of cores (virtual CPU devices)
             return files.length;
-        } catch(Exception e) {
+        } catch (Exception e) {
             //Default to return 1 core
             return 1;
         }
-    }
+    } // end getNumCoresOld()
 }

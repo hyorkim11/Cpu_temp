@@ -18,17 +18,13 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-/**
- * Created by hrker on 10/28/16.
- */
-
-public class CalcTemp extends Activity implements SensorEventListener {
+public class CpuInfo extends Activity implements SensorEventListener {
+    // This helper class retrieves basic device CPU information
 
     private SensorManager mSensorManager;
-    private Sensor mTempSensor;
-
     private int mDeviceCores = 0;
     private String mCurFreq = "";
+    private Sensor mTempSensor;
 
     public void init() {
         // init sensor managers
@@ -52,12 +48,10 @@ public class CalcTemp extends Activity implements SensorEventListener {
 
     protected void onResume() {
         super.onResume();
-//        mSensorManager.registerListener(this, mTempSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     protected void onPause() {
         super.onPause();
-//        mSensorManager.unregisterListener(this);
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -65,7 +59,6 @@ public class CalcTemp extends Activity implements SensorEventListener {
 
     public void onSensorChanged(SensorEvent event) {
     }
-
 
 
     public static int getNumCores() {
@@ -92,14 +85,15 @@ public class CalcTemp extends Activity implements SensorEventListener {
             //Default to return 1 core
             return 1;
         }
-    }
+    }   // end getNumCores()
 
+    // changes mCurFreq
+    // takes total number of cores
+    // reads current scaling_cur_freq of each cores
+    // returns String[] of all the frequencies
+    // default cpu path "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
     private String[] getCurFrequency(int coreNum) {
-        // changes mCurFreq
-        // takes total number of cores
-        // reads current scaling_cur_freq of each cores
-        // returns String[] of all the frequencies
-        // default cpu path "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
+
         String[] frequencyList = new String[coreNum];
         String x;
 
@@ -118,7 +112,7 @@ public class CalcTemp extends Activity implements SensorEventListener {
         }
 
         return frequencyList;
-    }
+    }   // end getCurFrequency()
 
     // input : an array of Strings
     // output : an array of Ints
@@ -171,7 +165,7 @@ public class CalcTemp extends Activity implements SensorEventListener {
             cpuUsageAsInt[i] = Integer.parseInt(myString[i]);
         }
         return cpuUsageAsInt;
-    }
+    }   // end getCpuUsagesStatistic()
 
     private String executeTop() {
         java.lang.Process p = null;
@@ -197,5 +191,5 @@ public class CalcTemp extends Activity implements SensorEventListener {
             }
         }
         return returnString;
-    }
-}
+    }   // end executeTop()
+}   // end Class

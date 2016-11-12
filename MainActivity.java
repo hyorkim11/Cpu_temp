@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private Intent tempIntent;
     private Switch mSwitch;
     private CpuInfo CT;
+
 
 
     @Override
@@ -96,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Begin Temperature Service "TempService.java"
         tempIntent = new Intent(this, TempService.class);
+
+
     } // end init()
 
 
@@ -107,6 +111,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateBattery(intent);
+        }
+    };
+
 
     @Override
     public void onResume() {
@@ -114,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         startService(tempIntent);
         registerReceiver(broadcastReceiver, new IntentFilter(TempService.BROADCAST_ACTION));
+        registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     @Override
@@ -121,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
         // Unregister when this Activity Pauses to save battery life
         super.onPause();
         unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(batteryReceiver);
         stopService(tempIntent);
     }
 
@@ -134,6 +147,14 @@ public class MainActivity extends AppCompatActivity {
         tvTemperature.setText(value + " ");
     }
 
+    private void updateBattery(Intent intent) {
+        int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10;
+        if (mTempType) {
+            // fahrenheit
+            temp = (int) (temp * 1.8) + 32;
+        }
+        tvBatTemp.setText(temp + " ");
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
